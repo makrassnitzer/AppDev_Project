@@ -29,10 +29,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
-
+    var composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    implementation(composeBom)
+    implementation ("androidx.compose.material3:material3")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
