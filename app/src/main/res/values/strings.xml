@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">EventPlanner</string>
-    <string name="addEventBtn">Add new Event</string>
-    <string name="viewEventsBtn">My Events</string>
-    <string name="monthlyOverview">Monthly Overview:</string>
 </resources>
