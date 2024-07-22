@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +52,23 @@ fun MainScreen() {
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.SansSerif,
             color = Purple80
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.calendar),
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .padding(8.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        Text(
+            "Monthly Overview:",
+            fontSize = 22.sp,
+            color = Purple80,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(8.dp)
         )
     }
 
@@ -95,9 +115,8 @@ fun MainScreen() {
             ),
             border = BorderStroke(1.dp, Purple80)
         ) {
-            Text("View Calender",
+            Text("View Calendar",
                 fontSize = 18.sp)
         }
     }
-
 }
