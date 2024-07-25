@@ -4,7 +4,8 @@ import java.time.YearMonth
 
 data class CalendarUiState(
     val yearMonth: YearMonth,
-    val dates: List<Date>
+    val dates: List<Date>,
+    val selectedDateDetails: SelectedDateDetails? = null
 ) {
     companion object {
         val Init = CalendarUiState(
@@ -20,4 +21,10 @@ data class CalendarUiState(
             val Empty = Date("", false)
         }
     }
+
+    data class SelectedDateDetails(
+        val day: String,
+        val month: Int,
+        val year: Int
+    )
 }

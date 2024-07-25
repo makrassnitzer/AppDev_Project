@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,8 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.eventplanner.ui.CalendarViewModel
 import com.example.eventplanner.ui.DateUtil
 import com.example.eventplanner.ui.getDisplayName
@@ -65,26 +69,70 @@ fun CalendarApp(
         }
     ) { padding ->
 
-        Surface(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
-            CalendarWidget(
-                days = DateUtil.daysOfWeek,
-                yearMonth = uiState.yearMonth,
-                dates = uiState.dates,
-                onPreviousMonthButtonClicked = { prevMonth ->
-                    viewModel.toPreviousMonth(prevMonth)
-                },
-                onNextMonthButtonClicked = { nextMonth ->
-                    viewModel.toNextMonth(nextMonth)
-                },
-                onDateClickListener = {
-                    Log.d("TODO", "Handle Click Event")
-                }
-            )
+            Surface(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                CalendarWidget(
+                    days = DateUtil.daysOfWeek,
+                    yearMonth = uiState.yearMonth,
+                    dates = uiState.dates,
+                    onPreviousMonthButtonClicked = { prevMonth ->
+                        viewModel.toPreviousMonth(prevMonth)
+                    },
+                    onNextMonthButtonClicked = { nextMonth ->
+                        viewModel.toNextMonth(nextMonth)
+                    },
+                    onDateClickListener = { date ->
+                        viewModel.onDateSelected(date)
+                    }
+                )
+            }
+            uiState.selectedDateDetails?.let {
+                SelectedDateDetailsView(it)
+            }
+        }
+    }
+}
+
+@Composable
+fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Row(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Selected Date Details:",
+                    style = TextStyle(
+                        fontSize = 16.sp
+                    )
+                )
+                Text(
+                    text = "Day: ${details.day}",
+                    style = TextStyle(
+                        fontSize = 16.sp
+                    )
+                )
+                Text(
+                    text = "Month: ${details.month}",
+                    style = TextStyle(
+                        fontSize = 16.sp
+                    )
+                )
+                Text(
+                    text = "Year: ${details.year}",
+                    style = TextStyle(
+                        fontSize = 16.sp
+                    )
+                )
+            }
         }
     }
 }

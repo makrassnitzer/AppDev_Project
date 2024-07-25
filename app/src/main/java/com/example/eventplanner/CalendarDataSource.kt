@@ -1,8 +1,6 @@
 package com.example.eventplanner
 
 import com.example.eventplanner.ui.getDayOfMonthStartingFromMonday
-import java.time.DayOfWeek
-import java.time.LocalDate
 import java.time.YearMonth
 
 class CalendarDataSource {
@@ -15,7 +13,7 @@ class CalendarDataSource {
                     } else {
                         "" // Fill with empty string for days outside the current month
                     },
-                    isSelected = date.isEqual(LocalDate.now()) && date.monthValue == yearMonth.monthValue
+                    isSelected = false // Initially no date is selected
                 )
             }
     }
