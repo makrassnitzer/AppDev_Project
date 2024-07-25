@@ -1,30 +1,24 @@
 package com.example.eventplanner.data
 
-import android.content.Context
-import android.net.Uri
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 
-class FileUtils(private val context: Context) {
+object JsonFileUtil {
+    private val gson = Gson()
 
-    fun savePdfFile(uri: Uri, fileName: String): String? {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val file = File(context.filesDir, fileName)
-
-        return try {
-            FileOutputStream(file).use { outputStream ->
-                val buffer = ByteArray(4 * 1024)
-                var read: Int
-                while (inputStream?.read(buffer).also { read = it ?: -1 } != -1) {
-                    outputStream.write(buffer, 0, read)
-                }
-                outputStream.flush()
-            }
-            file.absolutePath
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    fun readFromFile(file: File): List<Event> {
+        return if (file.exists()) {
+            val json = file.readText()
+            val eventType = object : TypeToken<List<Event>>() {}.type
+            gson.fromJson(json, eventType)
+        } else {
+            emptyList()
         }
+    }
+
+    fun writeToFile(file: File, events: List<Event>) {
+        val json = gson.toJson(events)
+        file.writeText(json)
     }
 }

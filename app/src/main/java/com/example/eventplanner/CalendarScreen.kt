@@ -1,6 +1,8 @@
 package com.example.eventplanner
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +39,7 @@ import com.example.eventplanner.ui.DateUtil
 import com.example.eventplanner.ui.getDisplayName
 import java.time.YearMonth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen() {
     Column (
@@ -48,6 +51,7 @@ fun CalendarScreen() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarApp(
@@ -89,6 +93,7 @@ fun CalendarApp(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarWidget(
     days: Array<String>,
@@ -121,6 +126,7 @@ fun CalendarWidget(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Header(
     yearMonth: YearMonth,
