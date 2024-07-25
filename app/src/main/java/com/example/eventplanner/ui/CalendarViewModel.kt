@@ -29,45 +29,13 @@ class CalendarViewModel : ViewModel() {
 
     fun toNextMonth(nextMonth: YearMonth) {
         viewModelScope.launch {
-            val selectedDateDetails = _uiState.value.selectedDateDetails
-            val dates = dataSource.getDates(nextMonth).map { date ->
-                if (selectedDateDetails != null &&
-                    selectedDateDetails.day == date.dayOfMonth &&
-                    selectedDateDetails.month == nextMonth.monthValue &&
-                    selectedDateDetails.year == nextMonth.year) {
-                    date.copy(isSelected = true)
-                } else {
-                    date
-                }
-            }
-            _uiState.update { currentState ->
-                currentState.copy(
-                    yearMonth = nextMonth,
-                    dates = dates
-                )
-            }
+            handleMonthChange(nextMonth)
         }
     }
 
     fun toPreviousMonth(prevMonth: YearMonth) {
         viewModelScope.launch {
-            val selectedDateDetails = _uiState.value.selectedDateDetails
-            val dates = dataSource.getDates(prevMonth).map { date ->
-                if (selectedDateDetails != null &&
-                    selectedDateDetails.day == date.dayOfMonth &&
-                    selectedDateDetails.month == prevMonth.monthValue &&
-                    selectedDateDetails.year == prevMonth.year) {
-                    date.copy(isSelected = true)
-                } else {
-                    date
-                }
-            }
-            _uiState.update { currentState ->
-                currentState.copy(
-                    yearMonth = prevMonth,
-                    dates = dates
-                )
-            }
+            handleMonthChange(prevMonth)
         }
     }
 
@@ -87,6 +55,26 @@ class CalendarViewModel : ViewModel() {
                     month = it.yearMonth.monthValue,
                     year = it.yearMonth.year
                 )
+            )
+        }
+    }
+
+    private fun handleMonthChange(monthChange: YearMonth){
+        val selectedDateDetails = _uiState.value.selectedDateDetails
+        val dates = dataSource.getDates(monthChange).map { date ->
+            if (selectedDateDetails != null &&
+                selectedDateDetails.day == date.dayOfMonth &&
+                selectedDateDetails.month == monthChange.monthValue &&
+                selectedDateDetails.year == monthChange.year) {
+                date.copy(isSelected = true)
+            } else {
+                date
+            }
+        }
+        _uiState.update { currentState ->
+            currentState.copy(
+                yearMonth = monthChange,
+                dates = dates
             )
         }
     }
