@@ -222,11 +222,19 @@ fun Content(
             Row {
                 repeat(7) {
                     val item = if (index < dates.size) dates[index] else CalendarUiState.Date.Empty
-                    ContentItem(
-                        date = item,
-                        onClickListener = onDateClickListener,
-                        modifier = Modifier.weight(1f)
-                    )
+                    if(item == CalendarUiState.Date.Empty){
+                        ContentItem(
+                            date = item,
+                            onClickListener = {},
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        ContentItem(
+                            date = item,
+                            onClickListener = onDateClickListener,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                     index++
                 }
             }
