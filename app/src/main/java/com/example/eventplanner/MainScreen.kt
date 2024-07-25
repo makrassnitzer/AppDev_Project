@@ -175,6 +175,7 @@ fun MainScreen(navController: NavController) {
                         modifier = Modifier.padding(5.dp)
                     )
 
+                    // dropdown for small overview
                     ExposedDropdownMenuBox(
                             expanded = isExpanded,
                             onExpandedChange = { isExpanded = it },
@@ -197,6 +198,7 @@ fun MainScreen(navController: NavController) {
                                 colors = TextFieldDefaults.textFieldColors(
                                     focusedTrailingIconColor = Purple80,
                                     unfocusedTrailingIconColor = Purple80,
+                                    focusedIndicatorColor = Purple80,
                                     unfocusedIndicatorColor = Purple80
                                 ),
                                 modifier = Modifier.menuAnchor()
@@ -254,7 +256,6 @@ fun MainScreen(navController: NavController) {
                 MonthlyOverview()
             }
         }
-
     }
         // column for nav buttons
         Column(
@@ -385,19 +386,6 @@ private fun MonthlyOverview() {
                     fontWeight = FontWeight.Light
                 )
             }
-            /*
-            IconButton(
-                onClick = { },
-                modifier = Modifier.background(
-                    color = Purple80,
-                    shape = RoundedCornerShape(10.dp)
-                )
-            ) {
-                Icon(Icons.Default., tint = Color.White, contentDescription = null)
-            }
-
- */
-
         }
     }
 }
