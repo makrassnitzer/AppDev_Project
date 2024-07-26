@@ -19,63 +19,74 @@ class CalendarViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    dates = dataSource.getDates(currentState.yearMonth)
-                )
-            }
+            fetchEventsForMonth(_uiState.value.yearMonth)
         }
     }
 
     fun toNextMonth(nextMonth: YearMonth) {
-        viewModelScope.launch {
-            handleMonthChange(nextMonth)
-        }
+        fetchEventsForMonth(nextMonth)
+        handleMonthChange(nextMonth)
     }
 
     fun toPreviousMonth(prevMonth: YearMonth) {
-        viewModelScope.launch {
-            handleMonthChange(prevMonth)
-        }
+        fetchEventsForMonth(prevMonth)
+        handleMonthChange(prevMonth)
     }
 
     fun onDateSelected(date: CalendarUiState.Date) {
-        val updatedDates = _uiState.value.dates.map {
-            if (it == date) {
-                it.copy(isSelected = true)
-            } else {
-                it.copy(isSelected = false)
+        viewModelScope.launch {
+            val events = dataSource.getEventsForDate(date.dayOfMonth.toInt(), _uiState.value.yearMonth)
+            val updatedDates = _uiState.value.dates.map {
+                it.copy(isSelected = it == date)
             }
-        }
-        _uiState.update {
-            it.copy(
-                dates = updatedDates,
-                selectedDateDetails = CalendarUiState.SelectedDateDetails(
-                    day = date.dayOfMonth,
-                    month = it.yearMonth.monthValue,
-                    year = it.yearMonth.year
+            _uiState.update {
+                it.copy(
+                    dates = updatedDates,
+                    selectedDateDetails = CalendarUiState.SelectedDateDetails(
+                        day = date.dayOfMonth,
+                        month = it.yearMonth.monthValue,
+                        year = it.yearMonth.year,
+                        events = events
+                    )
                 )
-            )
+            }
         }
     }
 
-    private fun handleMonthChange(monthChange: YearMonth){
-        val selectedDateDetails = _uiState.value.selectedDateDetails
-        val dates = dataSource.getDates(monthChange).map { date ->
-            if (selectedDateDetails != null &&
-                selectedDateDetails.day == date.dayOfMonth &&
-                selectedDateDetails.month == monthChange.monthValue &&
-                selectedDateDetails.year == monthChange.year) {
-                date.copy(isSelected = true)
-            } else {
-                date
+    private fun handleMonthChange(monthChange: YearMonth) {
+        viewModelScope.launch {
+            val selectedDateDetails = _uiState.value.selectedDateDetails
+            val events = dataSource.getEventsForMonth(monthChange)
+            val dates = dataSource.getDates(monthChange, events).map { date ->
+                if (selectedDateDetails != null &&
+                    selectedDateDetails.day == date.dayOfMonth &&
+                    selectedDateDetails.month == monthChange.monthValue &&
+                    selectedDateDetails.year == monthChange.year
+                ) {
+                    date.copy(isSelected = true)
+                } else {
+                    date
+                }
+            }
+            _uiState.update { currentState ->
+                currentState.copy(
+                    yearMonth = monthChange,
+                    dates = dates
+                )
             }
         }
-        _uiState.update { currentState ->
-            currentState.copy(
-                yearMonth = monthChange,
-                dates = dates
-            )
+    }
+
+    private fun fetchEventsForMonth(yearMonth: YearMonth) {
+        viewModelScope.launch {
+            val events = dataSource.getEventsForMonth(yearMonth)
+            val dates = dataSource.getDates(yearMonth, events)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    yearMonth = yearMonth,
+                    dates = dates
+                )
+            }
         }
     }
 }

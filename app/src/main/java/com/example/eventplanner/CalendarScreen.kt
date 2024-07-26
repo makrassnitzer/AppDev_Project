@@ -14,7 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -99,7 +99,7 @@ fun CalendarApp(
 
 @Composable
 fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
-    Card(
+    ElevatedCard (
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.padding(10.dp)
     ) {
@@ -121,10 +121,27 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
                     text = "Year: ${details.year}",
                     style = MaterialTheme.typography.headlineSmall
                 )
+            }
+        }
+    }
+    ElevatedCard (
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Row(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Event Details...",
+                    text = "Events:",
                     style = MaterialTheme.typography.headlineSmall
                 )
+                details.events.forEach { event ->
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = event,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
             }
         }
     }
@@ -251,7 +268,10 @@ fun ContentItem(
     Box(
         modifier = modifier
             .background(
-                color = if (date.isSelected) {
+                color = if (date.hasEvents) {// Change color if the date has events
+                    //TODO Different Colors for Events
+                    MaterialTheme.colorScheme.error
+                } else if (date.isSelected) {
                     MaterialTheme.colorScheme.secondaryContainer
                 } else {
                     Color.Transparent
