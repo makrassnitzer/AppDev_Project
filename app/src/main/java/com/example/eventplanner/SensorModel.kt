@@ -17,6 +17,7 @@ class SensorModel(application: Application) : AndroidViewModel(application), Sen
     private var acceleration = 10f
     private var currentAcceleration = SensorManager.GRAVITY_EARTH
     private var lastAcceleration = SensorManager.GRAVITY_EARTH
+    private var lastSensorEvent: Long = 0
     var onShake: (() -> Unit)? = null
 
     init {
@@ -45,8 +46,15 @@ class SensorModel(application: Application) : AndroidViewModel(application), Sen
 
             // Acceleration über 12 wird als schütteln anerkannt
             if (acceleration > 12) {
-                Log.d("Sensor event detected", "Event 2: $acceleration")
-                onShake?.invoke();
+                val currTime = System.currentTimeMillis()
+                Log.d("Sensor event detected", "curr time: $currTime, last time: $lastSensorEvent")
+
+                // verhindern vom Öffnen mehrerer Views durchs gleiche Event
+                if (currTime - lastSensorEvent > 2000) {
+                    lastSensorEvent = currTime
+                    Log.d("Sensor event detected", "Event 2: $acceleration")
+                    onShake?.invoke();
+                }
             }
         }
     }
