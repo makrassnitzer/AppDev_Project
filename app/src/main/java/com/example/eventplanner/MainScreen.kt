@@ -291,7 +291,7 @@ fun MainScreen(navController: NavController) {
                 border = BorderStroke(1.dp, Purple80)
             ) {
                 Text(
-                    "My Events",
+                    "View all Events",
                     fontSize = 18.sp
                 )
             }
