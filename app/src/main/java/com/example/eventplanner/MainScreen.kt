@@ -339,7 +339,7 @@ private fun UpcomingEventsCard(event: Event) {
                 )
 
                 Text(
-                    text = event.datum,
+                    text = event.datum.toLocalDate().toString(),
                     color = Purple80,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light

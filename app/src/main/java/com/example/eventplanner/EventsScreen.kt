@@ -120,6 +120,7 @@ fun MyEventsScreen(context: Context) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun EventsCard(event: Event) {
     var showDetail by remember { mutableStateOf(false) }
@@ -141,7 +142,7 @@ private fun EventsCard(event: Event) {
                 )
 
                 Text(
-                    text = event.datum,
+                    text = event.datum.toLocalDate().toString(),
                     color = Purple80,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Light
@@ -166,11 +167,11 @@ private fun EventsCard(event: Event) {
             title = { Text(text = event.bezeichnung) },
             text = {
                 Column {
-                    Text(text = "Datum: ${event.datum}")
-                    Text(text = "Uhrzeit: ${event.uhrzeit}")
-                    Text(text = "Standort: ${event.standort}")
-                    Text(text = "Teilnehmer: ${event.teilnehmer}")
-                    Text(text = "Ausgaben: ${event.ausgaben}")
+                    Text(text = "Date: ${event.datum.toLocalDate()}")
+                    Text(text = "Time: ${event.datum.toLocalTime()}")
+                    Text(text = "Location: ${event.standort}")
+                    Text(text = "Members: ${event.teilnehmer}")
+                    Text(text = "Costs: ${event.ausgaben}")
                     event.additionalInfoPath?.let {
                         Text(text = "Additional Info: $it")
                     }
