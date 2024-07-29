@@ -5,22 +5,43 @@ import android.app.TimePickerDialog
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.eventplanner.data.Event
 import com.example.eventplanner.data.EventUtils
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-import com.example.eventplanner.data.Event
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -35,11 +56,11 @@ fun AddEventScreen(navController: NavController) {
     var additionalInfoPath by remember { mutableStateOf(TextFieldValue()) }
 
     val context = LocalContext.current
-
     var showSnackbar by remember { mutableStateOf(false) }
-
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+    var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -111,8 +132,36 @@ fun AddEventScreen(navController: NavController) {
                 value = standort,
                 onValueChange = { standort = it },
                 label = { Text("Standort") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    TextButton(onClick = {
+                        // Show Google Maps dialog to pick location
+                    }) {
+                        Text("Select Location")
+                    }
+                }
             )
+            Box(modifier = Modifier.height(300.dp).fillMaxWidth()) {
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
+                }
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    onMapClick = { latLng ->
+                        selectedLocation = latLng
+                        standort = TextFieldValue("${latLng.latitude}, ${latLng.longitude}")
+                    }
+                ) {
+                    selectedLocation?.let {
+                        Marker(
+                            state = MarkerState(position = it),
+                            title = "Selected Location"
+                        )
+                    }
+                }
+            }
             OutlinedTextField(
                 value = teilnehmer,
                 onValueChange = { teilnehmer = it },
