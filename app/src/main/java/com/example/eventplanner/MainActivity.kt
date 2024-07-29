@@ -25,6 +25,15 @@ import android.Manifest
 class MainActivity : ComponentActivity() {
     private val sensorModel: SensorModel by viewModels()
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Berechtigung erteilt
+        } else {
+            // Berechtigung verweigert
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +96,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun checkNotificationPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Sie haben bereits die Berechtigung
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                // Zeigen Sie eine Erklärung an, warum die Berechtigung benötigt wird
+            }
+            else -> {
+                // Direkt um die Berechtigung bitten
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
 }

@@ -8,13 +8,20 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.eventplanner.NotificationReceiver
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
+import java.util.Calendar
+import java.util.UUID
 
 object EventUtils {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val gson: Gson = GsonBuilder()
+        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+        .create()
 
     fun generateId(): String {
         return UUID.randomUUID().toString()
@@ -28,20 +35,23 @@ object EventUtils {
         scheduleNotification(event, context)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadEventsFromFile(context: Context): List<Event> {
         val file = File(context.filesDir, "events.json")
         if (!file.exists()) return emptyList()
         val json = file.readText()
         val type = object : TypeToken<List<Event>>() {}.type
-        return Gson().fromJson(json, type)
+        return gson.fromJson(json, type)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveEventsToFile(events: List<Event>, context: Context) {
-        val json = Gson().toJson(events)
+        val json = gson.toJson(events)
         val file = File(context.filesDir, "events.json")
         file.writeText(json)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getEventById(eventId: String, context: Context): Event? {
         val events = loadEventsFromFile(context)
         return events.find { it.id == eventId }
@@ -54,10 +64,10 @@ object EventUtils {
         if (index != -1) {
             events[index] = updatedEvent
             saveEventsToFile(events, context)
-            scheduleNotification(updatedEvent, context)
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun deleteEventById(eventId: String, context: Context) {
         val events = loadEventsFromFile(context).toMutableList()
         val index = events.indexOfFirst { it.id == eventId }
