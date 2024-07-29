@@ -1,5 +1,7 @@
 package com.example.eventplanner
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,14 +12,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eventplanner.data.EventUtils
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import com.example.eventplanner.data.Event
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddEventScreen(navController: NavController) {
     var bezeichnung by remember { mutableStateOf(TextFieldValue()) }
     var eventart by remember { mutableStateOf(TextFieldValue()) }
     var datum by remember { mutableStateOf(TextFieldValue()) }
-    var uhrzeit by remember { mutableStateOf(TextFieldValue()) }
     var standort by remember { mutableStateOf(TextFieldValue()) }
     var teilnehmer by remember { mutableStateOf(TextFieldValue()) }
     var ausgaben by remember { mutableStateOf(TextFieldValue()) }
@@ -50,13 +54,7 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = datum,
                 onValueChange = { datum = it },
-                label = { Text("Datum") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = uhrzeit,
-                onValueChange = { uhrzeit = it },
-                label = { Text("Uhrzeit") },
+                label = { Text("Datum (yyyy-MM-dd-HH-mm-ss)") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
@@ -85,12 +83,14 @@ fun AddEventScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = {
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+                val eventDateTime = LocalDateTime.parse(datum.text, formatter)
+
                 val event = Event(
                     id = EventUtils.generateId(),
                     bezeichnung = bezeichnung.text,
                     eventart = eventart.text,
-                    datum = datum.text,
-                    uhrzeit = uhrzeit.text,
+                    datum = eventDateTime,
                     standort = standort.text,
                     teilnehmer = teilnehmer.text,
                     ausgaben = ausgaben.text.toDoubleOrNull() ?: 0.0,
