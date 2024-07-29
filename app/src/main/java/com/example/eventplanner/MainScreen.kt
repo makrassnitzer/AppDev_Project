@@ -50,9 +50,12 @@ import androidx.navigation.NavController
 import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.theme.Purple80
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.items
 import com.example.eventplanner.data.Event
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavController, context: Context) {

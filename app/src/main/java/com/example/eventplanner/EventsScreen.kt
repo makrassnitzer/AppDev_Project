@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.theme.Purple80
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -44,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.eventplanner.data.Event
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyEventsScreen(context: Context) {
     // events aus dem json laden

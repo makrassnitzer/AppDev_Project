@@ -4,4 +4,6 @@
     <string name="next">Next</string>
     <string name="ok">OK</string>
     <string name="viewEvents">View Events</string>
+    <string name="channel_name">EventNotification</string>
+    <string name="channel_description">EventNotificationDescription</string>
 </resources>
