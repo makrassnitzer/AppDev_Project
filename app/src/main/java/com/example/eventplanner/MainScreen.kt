@@ -3,9 +3,7 @@ package com.example.eventplanner
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +15,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,11 +47,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.theme.Purple80
+import android.content.Context
+import androidx.compose.foundation.lazy.items
+import com.example.eventplanner.data.Event
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavController, context: Context) {
+    // events aus dem json laden
+    val events = EventUtils.loadEventsFromFile(context);
+
+    // fürs Dropdown benötigt
     var isExpanded by remember {
         mutableStateOf(false)
     }
@@ -132,16 +136,14 @@ fun MainScreen(navController: NavController) {
                 }
 
                 LazyRow() {
-                    items(4) { index ->
-                        UpcomingEventsCard(
-                            name = "Event $index"
-                        )
+                    items(events) { event ->
+                        UpcomingEventsCard(event)
                     }
                 }
             }
         }
 
-        // monthly overview card
+        // overview card
         Card(
             shape = RoundedCornerShape(14.dp),
             elevation = CardDefaults.cardElevation(
@@ -316,7 +318,7 @@ fun MainScreen(navController: NavController) {
 }
 
 @Composable
-private fun UpcomingEventsCard(name: String) {
+private fun UpcomingEventsCard(event: Event) {
     Card(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Purple80),
@@ -327,14 +329,14 @@ private fun UpcomingEventsCard(name: String) {
         Row(modifier = Modifier.padding(20.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "name",
+                    text = event.bezeichnung,
                     fontSize = 16.sp,
                     color = Purple80,
                     fontWeight = FontWeight.SemiBold
                 )
 
                 Text(
-                    text = "datum",
+                    text = event.datum,
                     color = Purple80,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light

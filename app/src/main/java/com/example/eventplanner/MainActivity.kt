@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,9 +37,9 @@ class MainActivity : ComponentActivity() {
 
                     // Navigation zwischen den einzelnen Views
                     NavHost(navController, startDestination = "home") {
-                        composable("home") { MainScreen(navController) }
+                        composable("home") { MainScreen(navController, context = LocalContext.current) }
                         composable("addEvent") { AddEventScreen(navController) }
-                        composable("myEvents") { MyEventsScreen() }
+                        composable("myEvents") { MyEventsScreen(context = LocalContext.current) }
                         composable("calendar") { CalendarScreen() }
                     }
                 }
