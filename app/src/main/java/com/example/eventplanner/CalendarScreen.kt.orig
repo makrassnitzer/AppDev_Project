@@ -1,8 +1,11 @@
 package com.example.eventplanner
 
+<<<<<<< HEAD
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+=======
+>>>>>>> origin/main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -152,6 +155,7 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarWidget(
     days: Array<String>,
