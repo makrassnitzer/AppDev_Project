@@ -1,147 +1,123 @@
 package com.example.eventplanner
 
-import EventViewModel
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.data.Event
 
 @Composable
-fun AddEventScreen(eventViewModel: EventViewModel = viewModel()) {
-    var id by remember { mutableStateOf("") }
-    var bezeichnung by remember { mutableStateOf("") }
-    var eventart by remember { mutableStateOf("") }
-    var datum by remember { mutableStateOf("") }
-    var uhrzeit by remember { mutableStateOf("") }
-    var standort by remember { mutableStateOf("") }
-    var teilnehmer by remember { mutableStateOf("") }
-    var ausgaben by remember { mutableStateOf("") }
-    var additionalInfoPath by remember { mutableStateOf("") }
+fun AddEventScreen(navController: NavController) {
+    var bezeichnung by remember { mutableStateOf(TextFieldValue()) }
+    var eventart by remember { mutableStateOf(TextFieldValue()) }
+    var datum by remember { mutableStateOf(TextFieldValue()) }
+    var uhrzeit by remember { mutableStateOf(TextFieldValue()) }
+    var standort by remember { mutableStateOf(TextFieldValue()) }
+    var teilnehmer by remember { mutableStateOf(TextFieldValue()) }
+    var ausgaben by remember { mutableStateOf(TextFieldValue()) }
+    var additionalInfoPath by remember { mutableStateOf(TextFieldValue()) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        item {
-            Text(text = "Add Event", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(bottom = 16.dp))
-        }
+    val context = LocalContext.current
 
-        item {
-            OutlinedTextField(
-                value = id,
-                onValueChange = { id = it },
-                label = { Text("ID") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-            )
-        }
+    var showSnackbar by remember { mutableStateOf(false) }
 
-        item {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             OutlinedTextField(
                 value = bezeichnung,
                 onValueChange = { bezeichnung = it },
                 label = { Text("Bezeichnung") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = eventart,
                 onValueChange = { eventart = it },
                 label = { Text("Eventart") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = datum,
                 onValueChange = { datum = it },
                 label = { Text("Datum") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = uhrzeit,
                 onValueChange = { uhrzeit = it },
                 label = { Text("Uhrzeit") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = standort,
                 onValueChange = { standort = it },
                 label = { Text("Standort") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = teilnehmer,
                 onValueChange = { teilnehmer = it },
                 label = { Text("Teilnehmer") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = ausgaben,
                 onValueChange = { ausgaben = it },
                 label = { Text("Ausgaben") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             )
-        }
-
-        item {
             OutlinedTextField(
                 value = additionalInfoPath,
                 onValueChange = { additionalInfoPath = it },
                 label = { Text("Additional Info Path") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(onClick = {
+                val event = Event(
+                    id = EventUtils.generateId(),
+                    bezeichnung = bezeichnung.text,
+                    eventart = eventart.text,
+                    datum = datum.text,
+                    uhrzeit = uhrzeit.text,
+                    standort = standort.text,
+                    teilnehmer = teilnehmer.text,
+                    ausgaben = ausgaben.text.toDoubleOrNull() ?: 0.0,
+                    additionalInfoPath = additionalInfoPath.text
+                )
+                EventUtils.saveEventToFile(event, context)
+                showSnackbar = true
+            }) {
+                Text("Save Event")
+            }
         }
 
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = {
-                        val event = Event(
-                            id = 1,
-                            bezeichnung = "1",
-                            eventart = "1",
-                            datum = "1",
-                            uhrzeit = "1",
-                            standort = "1",
-                            teilnehmer = "1",
-                            ausgaben = 1.00,
-                            additionalInfoPath = "1"
-                        )
-                        eventViewModel.addEvent(event)
+        if (showSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(8.dp),
+                action = {
+                    Button(onClick = {
+                        showSnackbar = false
+                        navController.popBackStack()
+                    }) {
+                        Text("OK")
                     }
-                ) {
-                    Text("Save Event")
                 }
+            ) {
+                Text(text = "Event created successfully")
             }
         }
     }

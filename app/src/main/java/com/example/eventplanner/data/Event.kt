@@ -1,7 +1,7 @@
 package com.example.eventplanner.data
 
 data class Event(
-    val id: Int,
+    val id: String,
     val bezeichnung: String,
     val eventart: String,
     val datum: String,
