@@ -1,5 +1,9 @@
 package com.example.eventplanner
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,51 +12,59 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.eventplanner.data.Event
 import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.theme.Purple80
-import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.eventplanner.data.Event
 
+@SuppressLint("ResourceType")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyEventsScreen(context: Context) {
     // events aus dem json laden
-    val events = EventUtils.loadEventsFromFile(context);
+    var events by remember { mutableStateOf(EventUtils.loadEventsFromFile(context)) }
+    // selectedType fürs dropdown
+    var selectedType by remember { mutableStateOf("all") }
 
     // set background img
     var modifier = Modifier
@@ -72,8 +84,17 @@ fun MyEventsScreen(context: Context) {
             fontFamily = FontFamily.SansSerif,
             color = Purple80
         )
+        Image(
+            painter = painterResource(id = R.drawable.calendar),
+            contentDescription = null,
+            modifier = Modifier
+                .size(130.dp)
+                .padding(8.dp),
+            contentScale = ContentScale.Crop
+        )
     }
 
+    // events column
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -102,16 +123,15 @@ fun MyEventsScreen(context: Context) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "All Events",
-                        fontSize = 24.sp,
-                        color = Purple80,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(6.dp)
+                    CardHeader(
+                        onFilterSelected = { filterType ->
+                            selectedType = filterType
+                            events = EventUtils.loadEventsFromFile(context).filter {
+                                it.eventart == selectedType || selectedType == "all"
+                            }
+                        }
                     )
                 }
-
                 LazyRow() {
                     items(events) { event ->
                         EventsCard(event)
@@ -122,6 +142,83 @@ fun MyEventsScreen(context: Context) {
     }
 }
 
+// events card header
+@Composable
+private fun CardHeader(onFilterSelected: (String) -> Unit) {
+    var showFilter by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf("all") }
+
+    Text(
+        text = "All Events",
+        fontSize = 24.sp,
+        color = Purple80,
+        fontWeight = FontWeight.SemiBold,
+        style = MaterialTheme.typography.headlineLarge,
+        modifier = Modifier.padding(6.dp)
+    )
+    IconButton(
+        onClick = { showFilter = true },
+        modifier = Modifier.background(
+            color = Color.White,
+            shape = RoundedCornerShape(10.dp)
+        )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.filter),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+
+    if (showFilter) {
+        AlertDialog(
+            title = {
+                Text(
+                    text = "Filter",
+                    color = Purple80,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Select type",
+                        fontSize = 18.sp,
+                        color = Purple80,
+                    )
+                    EventTypeDropdown(
+                        selectedType = selectedType,
+                        onSelected = { type ->
+                            selectedType = type
+                        }
+                    )
+                }
+            },
+            onDismissRequest = {
+                showFilter = true
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showFilter = false }
+                ) {
+                    Icon(Icons.Default.Close, tint = Color.Red, contentDescription = null)
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showFilter = false
+                        onFilterSelected(selectedType)
+                    }
+                ) {
+                    Icon(Icons.Default.Check, tint = Color.Green, contentDescription = null)
+                }
+            }
+        )
+    }
+}
+
+// events card body
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun EventsCard(event: Event) {
@@ -186,6 +283,10 @@ private fun EventsCard(event: Event) {
                         color = Purple80
                     )
                     Text(
+                        text = "Type: ${event.eventart}",
+                        color = Purple80
+                    )
+                    Text(
                         text = "Location: ${event.standort}",
                         color = Purple80
                     )
@@ -214,5 +315,133 @@ private fun EventsCard(event: Event) {
                 }
             }
         )
+    }
+}
+
+// filter-dropdown
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EventTypeDropdown(selectedType: String, onSelected: (String) -> Unit) {
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = { isExpanded = it },
+        modifier = Modifier
+            .width(170.dp)
+            .height(45.dp)
+    ) {
+        TextField(
+            value = selectedType,
+            onValueChange = {},
+            readOnly = true,
+            textStyle = TextStyle().copy(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Light,
+                color = Purple80
+            ),
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedTrailingIconColor = Purple80,
+                unfocusedTrailingIconColor = Purple80,
+                focusedIndicatorColor = Purple80,
+                unfocusedIndicatorColor = Purple80
+            ),
+            modifier = Modifier.menuAnchor()
+        )
+
+        ExposedDropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false }
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "all",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("all")
+                    isExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "private",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("private")
+                    isExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "work",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("work")
+                    isExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "sports",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("sports")
+                    isExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "concert",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("concerts")
+                    isExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "other",
+                        color = Purple80,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                },
+                onClick = {
+                    onSelected("other")
+                    isExpanded = false
+                }
+            )
+        }
     }
 }

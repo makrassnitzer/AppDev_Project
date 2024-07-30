@@ -401,6 +401,10 @@ private fun UpcomingEventsCard(event: Event) {
                         color = Purple80
                     )
                     Text(
+                        text = "Type: ${event.eventart}",
+                        color = Purple80
+                    )
+                    Text(
                         text = "Location: ${event.standort}",
                         color = Purple80
                     )
