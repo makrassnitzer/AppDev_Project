@@ -1,5 +1,6 @@
 package com.example.eventplanner
 
+import AddEventScreen
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.pm.PackageManager
@@ -20,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventplanner.ui.theme.EventPlannerTheme
 import android.Manifest
+import com.google.android.libraries.places.api.Places
 
 
 class MainActivity : ComponentActivity() {
@@ -64,6 +66,10 @@ class MainActivity : ComponentActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotificationPermission()
+        }
+
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, "AIzaSyBTeYwL3aV9Zo7RXqo_umtq4zGTIdlTHQo")
         }
     }
     private fun createNotificationChannel() {
