@@ -375,7 +375,7 @@ private fun EventTypeDropdown(selectedType: String, onSelected: (String) -> Unit
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = "private",
+                        text = stringResource(id = R.string.type_private),
                         color = Purple80,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Light
@@ -389,7 +389,7 @@ private fun EventTypeDropdown(selectedType: String, onSelected: (String) -> Unit
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = "work",
+                        text = stringResource(id = R.string.type_work),
                         color = Purple80,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Light
@@ -403,7 +403,7 @@ private fun EventTypeDropdown(selectedType: String, onSelected: (String) -> Unit
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = "sports",
+                        text = stringResource(id = R.string.type_sports),
                         color = Purple80,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Light
@@ -417,21 +417,21 @@ private fun EventTypeDropdown(selectedType: String, onSelected: (String) -> Unit
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = "concert",
+                        text = stringResource(id = R.string.type_concert),
                         color = Purple80,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Light
                     )
                 },
                 onClick = {
-                    onSelected("concerts")
+                    onSelected("concert")
                     isExpanded = false
                 }
             )
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = "other",
+                        text = stringResource(id = R.string.type_other),
                         color = Purple80,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Light

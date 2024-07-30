@@ -482,8 +482,9 @@ private fun filterForOverview(events: List<Event>, filterPeriod: String): List<E
     val today = LocalDateTime.now()
     return when (filterPeriod) {
         "current month" -> {
-            val startOfMonth = YearMonth.now().atDay(1).atStartOfDay()
-            events.filter { !it.datum.isBefore(startOfMonth) }
+            val startOfCurrMonth = YearMonth.now().atDay(1).atStartOfDay()
+            val endOfCurrMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59)
+            events.filter { !it.datum.isBefore(startOfCurrMonth) && !it.datum.isAfter(endOfCurrMonth) }
         }
 
         "last month" -> {

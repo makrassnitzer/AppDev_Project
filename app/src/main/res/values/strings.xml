@@ -6,4 +6,9 @@
     <string name="viewEvents">View Events</string>
     <string name="channel_name">EventNotification</string>
     <string name="channel_description">EventNotificationDescription</string>
+    <string name="type_private">private</string>
+    <string name="type_work">work</string>
+    <string name="type_sports">sports</string>
+    <string name="type_concert">concert</string>
+    <string name="type_other">other</string>
 </resources>
