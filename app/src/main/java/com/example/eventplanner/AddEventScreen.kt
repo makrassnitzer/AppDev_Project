@@ -16,11 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,11 +45,13 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddEventScreen(navController: NavController) {
     var bezeichnung by remember { mutableStateOf(TextFieldValue()) }
-    var eventart by remember { mutableStateOf(TextFieldValue()) }
+    var eventart by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf<LocalDate?>(null) }
     var time by remember { mutableStateOf<LocalTime?>(null) }
     var standort by remember { mutableStateOf("") }
@@ -59,6 +65,8 @@ fun AddEventScreen(navController: NavController) {
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
+    val eventTypes = listOf("private", "work", "sports", "concert", "other")
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -70,19 +78,43 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = bezeichnung,
                 onValueChange = { bezeichnung = it },
-                label = { Text("Bezeichnung") },
+                label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                value = eventart,
-                onValueChange = { eventart = it },
-                label = { Text("Eventart") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = eventart,
+                    onValueChange = {},
+                    label = { Text("Event Type") },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .clickable { expanded = true }
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    eventTypes.forEach { type ->
+                        DropdownMenuItem(
+                            text = { Text(type) },
+                            onClick = {
+                                eventart = type
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
             OutlinedTextField(
                 value = date?.format(dateFormatter) ?: "",
                 onValueChange = {},
-                label = { Text("Datum") },
+                label = { Text("Date") },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
@@ -105,7 +137,7 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = time?.format(timeFormatter) ?: "",
                 onValueChange = {},
-                label = { Text("Uhrzeit") },
+                label = { Text("Time") },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
@@ -133,13 +165,13 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = teilnehmer,
                 onValueChange = { teilnehmer = it },
-                label = { Text("Teilnehmer") },
+                label = { Text("Participants") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = ausgaben,
                 onValueChange = { ausgaben = it },
-                label = { Text("Ausgaben") },
+                label = { Text("Costs") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
@@ -160,7 +192,7 @@ fun AddEventScreen(navController: NavController) {
                     val event = Event(
                         id = EventUtils.generateId(),
                         bezeichnung = bezeichnung.text,
-                        eventart = eventart.text,
+                        eventart = eventart,
                         datum = eventDateTime,
                         standort = standort,
                         teilnehmer = teilnehmer.text,
@@ -230,7 +262,7 @@ fun AddressAutocomplete(
                     predictions = emptyList()
                 }
             },
-            label = { Text("Standort") },
+            label = { Text("Location") },
             modifier = Modifier.fillMaxWidth()
         )
 
