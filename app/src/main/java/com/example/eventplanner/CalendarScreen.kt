@@ -298,8 +298,7 @@ fun ContentItem(
         modifier = modifier
             .background(
                 color = if (date.hasEvents) {// Change color if the date has events
-                    //TODO Different Colors for Events
-                    MaterialTheme.colorScheme.error
+                    MaterialTheme.colorScheme.tertiary
                 } else if (date.isSelected) {
                     MaterialTheme.colorScheme.secondaryContainer
                 } else {
