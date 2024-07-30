@@ -88,7 +88,7 @@ fun AddEventScreen(navController: NavController) {
                 OutlinedTextField(
                     value = eventart,
                     onValueChange = {},
-                    label = { Text("Event Type") },
+                    label = { Text("Eventtype") },
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier
@@ -165,7 +165,7 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = teilnehmer,
                 onValueChange = { teilnehmer = it },
-                label = { Text("Participants") },
+                label = { Text("Participants (Email)") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
@@ -177,7 +177,7 @@ fun AddEventScreen(navController: NavController) {
             OutlinedTextField(
                 value = additionalInfoPath,
                 onValueChange = { additionalInfoPath = it },
-                label = { Text("Additional Info Path") },
+                label = { Text("Additional Info") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -200,6 +200,23 @@ fun AddEventScreen(navController: NavController) {
                         additionalInfoPath = additionalInfoPath.text
                     )
                     EventUtils.saveEventToFile(event, context)
+
+                    // Send email invitation
+                    val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "message/rfc822"
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(teilnehmer.text))
+                        putExtra(Intent.EXTRA_SUBJECT, "Invitation to ${event.bezeichnung}")
+                        putExtra(Intent.EXTRA_TEXT, """
+                            You are invited to ${event.bezeichnung}.
+                            
+                            Event Type: ${event.eventart}
+                            Date and Time: ${event.datum.format(dateFormatter)} at ${event.datum.format(timeFormatter)}
+                            Location: ${event.standort}
+                            Additional Info: ${event.additionalInfoPath}
+                        """.trimIndent())
+                    }
+                    context.startActivity(Intent.createChooser(emailIntent, "Send Email"))
+
                     showSnackbar = true
                 } catch (e: Exception) {
                     Log.e("AddEventScreen", "Error saving event", e)
@@ -223,7 +240,7 @@ fun AddEventScreen(navController: NavController) {
                     }
                 }
             ) {
-                Text(text = "Event created successfully")
+                Text(text = "Event created and email sent successfully")
             }
         }
     }
