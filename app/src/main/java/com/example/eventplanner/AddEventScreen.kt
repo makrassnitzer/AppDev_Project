@@ -61,6 +61,7 @@ fun AddEventScreen(navController: NavController) {
 
     val context = LocalContext.current
     var showSnackbar by remember { mutableStateOf(false) }
+    var showErrorSnackbar by remember { mutableStateOf(false) }
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -183,8 +184,9 @@ fun AddEventScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = {
                 try {
-                    if (date == null || time == null) {
-                        throw IllegalArgumentException("Date and time are required")
+                    if (date == null || time == null || bezeichnung.text.isEmpty()) {
+                        showErrorSnackbar = true
+                        throw IllegalArgumentException("Date, time and title are required")
                     }
 
                     val eventDateTime = LocalDateTime.of(date, time)
@@ -225,7 +227,22 @@ fun AddEventScreen(navController: NavController) {
                 Text("Save Event")
             }
         }
-
+        if (showErrorSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(8.dp),
+                action = {
+                    Button(onClick = {
+                        showErrorSnackbar = false
+                    }) {
+                        Text("OK")
+                    }
+                }
+            ) {
+                Text(text = "Title, date and time are required!")
+            }
+        }
         if (showSnackbar) {
             Snackbar(
                 modifier = Modifier
