@@ -7,7 +7,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.AndroidViewModel
 import kotlin.math.sqrt
 
@@ -65,7 +64,6 @@ class SensorModel(application: Application) : AndroidViewModel(application), Sen
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
     }
 
 }

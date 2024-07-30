@@ -240,7 +240,7 @@ fun AddEventScreen(navController: NavController) {
                     }
                 }
             ) {
-                Text(text = "Event created and email sent successfully")
+                Text(text = "Event created successfully")
             }
         }
     }

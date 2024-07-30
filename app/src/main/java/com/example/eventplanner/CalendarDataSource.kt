@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.eventplanner.data.Event
 import com.example.eventplanner.ui.getDayOfMonthStartingFromMonday
-import java.time.LocalDate
 import java.time.YearMonth
 
 class CalendarDataSource {
