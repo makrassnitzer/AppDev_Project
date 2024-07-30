@@ -52,8 +52,14 @@ import com.example.eventplanner.ui.theme.Purple80
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import com.example.eventplanner.data.Event
+import java.time.LocalDateTime
+import java.time.YearMonth
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,6 +96,7 @@ fun MainScreen(navController: NavController, context: Context) {
             color = Purple80
         )
 
+        // set img header
         Image(
             painter = painterResource(id = R.drawable.calendar),
             contentDescription = null,
@@ -134,10 +141,14 @@ fun MainScreen(navController: NavController, context: Context) {
                         text = "View All",
                         fontSize = 14.sp,
                         color = Purple80,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.clickable {
+                            navController.navigate("myEvents")
+                        }
                     )
                 }
 
+                // display upcoming events
                 LazyRow() {
                     items(events) { event ->
                         UpcomingEventsCard(event)
@@ -182,185 +193,252 @@ fun MainScreen(navController: NavController, context: Context) {
 
                     // dropdown for small overview
                     ExposedDropdownMenuBox(
-                            expanded = isExpanded,
-                            onExpandedChange = { isExpanded = it },
-                            modifier = Modifier
-                                .width(170.dp)
-                                .height(45.dp)
-                        ) {
-                            TextField(
-                                value = selectedPeriod,
-                                onValueChange = {},
-                                readOnly = true,
-                                textStyle = TextStyle().copy(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Light,
-                                    color = Purple80
-                                ),
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-                                },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    focusedTrailingIconColor = Purple80,
-                                    unfocusedTrailingIconColor = Purple80,
-                                    focusedIndicatorColor = Purple80,
-                                    unfocusedIndicatorColor = Purple80
-                                ),
-                                modifier = Modifier.menuAnchor()
-                            )
+                        expanded = isExpanded,
+                        onExpandedChange = { isExpanded = it },
+                        modifier = Modifier
+                            .width(170.dp)
+                            .height(45.dp)
+                    ) {
+                        TextField(
+                            value = selectedPeriod,
+                            onValueChange = {},
+                            readOnly = true,
+                            textStyle = TextStyle().copy(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Light,
+                                color = Purple80
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                            },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedTrailingIconColor = Purple80,
+                                unfocusedTrailingIconColor = Purple80,
+                                focusedIndicatorColor = Purple80,
+                                unfocusedIndicatorColor = Purple80
+                            ),
+                            modifier = Modifier.menuAnchor()
+                        )
 
-                            ExposedDropdownMenu(
-                                expanded = isExpanded,
-                                onDismissRequest = { isExpanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = "current month",
-                                            color = Purple80,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Light
-                                        )
-                                    },
-                                    onClick = {
-                                        selectedPeriod = "current month"
-                                        isExpanded = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = "last month",
-                                            color = Purple80,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Light
-                                        )
-                                    },
-                                    onClick = {
-                                        selectedPeriod = "last month"
-                                        isExpanded = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = "the last 90 days",
-                                            color = Purple80,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Light
-                                        )
-                                    },
-                                    onClick = {
-                                        selectedPeriod = "the last 90 days"
-                                        isExpanded = false
-                                    }
-                                )
+                        ExposedDropdownMenu(
+                            expanded = isExpanded,
+                            onDismissRequest = { isExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "current month",
+                                        color = Purple80,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Light
+                                    )
+                                },
+                                onClick = {
+                                    selectedPeriod = "current month"
+                                    isExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "last month",
+                                        color = Purple80,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Light
+                                    )
+                                },
+                                onClick = {
+                                    selectedPeriod = "last month"
+                                    isExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "the last 90 days",
+                                        color = Purple80,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Light
+                                    )
+                                },
+                                onClick = {
+                                    selectedPeriod = "the last 90 days"
+                                    isExpanded = false
+                                }
+                            )
                         }
                     }
                 }
-                MonthlyOverview()
+                // display overview
+                MonthlyOverview(events, selectedPeriod)
             }
         }
     }
-        // column for nav buttons
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+    // column for nav buttons
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        OutlinedButton(
+            onClick = { navController.navigate("addEvent") },
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .width(350.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Purple80
+            ),
+            border = BorderStroke(1.dp, Purple80)
         ) {
-            OutlinedButton(
-                onClick = { navController.navigate("addEvent") },
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .width(350.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Purple80
-                ),
-                border = BorderStroke(1.dp, Purple80)
-            ) {
-                Text(
-                    "Add new Event",
-                    fontSize = 18.sp
-                )
-            }
-
-            OutlinedButton(
-                onClick = { navController.navigate("myEvents") },
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .width(350.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Purple80
-                ),
-                border = BorderStroke(1.dp, Purple80)
-            ) {
-                Text(
-                    "View all Events",
-                    fontSize = 18.sp
-                )
-            }
-
-            OutlinedButton(
-                onClick = { navController.navigate("calendar") },
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .width(350.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Purple80
-                ),
-                border = BorderStroke(1.dp, Purple80)
-            ) {
-                Text(
-                    "View Calendar",
-                    fontSize = 18.sp
-                )
-            }
+            Text(
+                "Add new Event",
+                fontSize = 18.sp
+            )
         }
+        OutlinedButton(
+            onClick = { navController.navigate("myEvents") },
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .width(350.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Purple80
+            ),
+            border = BorderStroke(1.dp, Purple80)
+        ) {
+            Text(
+                "View all Events",
+                fontSize = 18.sp
+            )
+        }
+        OutlinedButton(
+            onClick = { navController.navigate("calendar") },
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .width(350.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Purple80
+            ),
+            border = BorderStroke(1.dp, Purple80)
+        ) {
+            Text(
+                "View Calendar",
+                fontSize = 18.sp
+            )
+        }
+    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun UpcomingEventsCard(event: Event) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Purple80),
-        modifier = Modifier
-            .padding(10.dp)
-            .width(165.dp)
-    ) {
-        Row(modifier = Modifier.padding(20.dp)) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = event.bezeichnung,
-                    fontSize = 16.sp,
-                    color = Purple80,
-                    fontWeight = FontWeight.SemiBold
-                )
+    var showDetail by remember { mutableStateOf(false) }
+    var upcomingEvent = false
 
-                Text(
-                    text = event.datum.toLocalDate().toString(),
-                    color = Purple80,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Light
-                )
-            }
+    if (LocalDateTime.now().isBefore(event.datum)) {
+        upcomingEvent = true;
+    }
 
-            IconButton(
-                onClick = { },
-                modifier = Modifier.background(
-                    color = Purple80,
-                    shape = RoundedCornerShape(10.dp)
-                )
-            ) {
-                Icon(Icons.Default.Info, tint = Color.White, contentDescription = null)
+    if (upcomingEvent) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, Purple80),
+            modifier = Modifier
+                .padding(10.dp)
+                .width(300.dp)
+        ) {
+            Row(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = event.bezeichnung,
+                        fontSize = 16.sp,
+                        color = Purple80,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = event.datum.toLocalDate().toString(),
+                        color = Purple80,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+
+                IconButton(
+                    onClick = { showDetail = true },
+                    modifier = Modifier.background(
+                        color = Purple80,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                ) {
+                    Icon(Icons.Default.Info, tint = Color.White, contentDescription = null)
+                }
             }
         }
     }
+
+    // info button handling
+    if (showDetail) {
+        AlertDialog(
+            icon = {
+                Icon(Icons.Default.Info, tint = Purple80, contentDescription = null)
+            },
+            title = {
+                Text(
+                    text = event.bezeichnung,
+                    color = Purple80
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Date: ${event.datum.toLocalDate()}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Time: ${event.datum.toLocalTime()}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Location: ${event.standort}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Members: ${event.teilnehmer}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Costs: ${event.ausgaben}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Additional Info: ${event.additionalInfoPath}",
+                        color = Purple80
+                    )
+                }
+            },
+            onDismissRequest = {
+                showDetail = false
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDetail = false }
+                ) {
+                    Icon(Icons.Default.Close, tint = Color.Red, contentDescription = null)
+                }
+            }
+        )
+    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun MonthlyOverview() {
+private fun MonthlyOverview(events: List<Event>, selectedPeriod: String) {
+    val filteredEvents = filterForOverview(events, selectedPeriod)
+    val periodCosts = calculateCosts(filteredEvents)
+    val differentLocations = countDifferentLocations(filteredEvents)
+
     Card(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Purple80),
@@ -371,21 +449,21 @@ private fun MonthlyOverview() {
         Row(modifier = Modifier.padding(20.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "number of events",
+                    text = "Number of events: " + filteredEvents.size,
                     fontSize = 16.sp,
                     color = Purple80,
                     fontWeight = FontWeight.Light
                 )
 
                 Text(
-                    text = "ausgaben",
+                    text = "Costs: $periodCosts €",
                     color = Purple80,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light
                 )
 
                 Text(
-                    text = "Orte",
+                    text = "Different Locations: $differentLocations",
                     color = Purple80,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light
@@ -393,4 +471,42 @@ private fun MonthlyOverview() {
             }
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun filterForOverview(events: List<Event>, filterPeriod: String): List<Event> {
+    val today = LocalDateTime.now()
+    return when (filterPeriod) {
+        "current month" -> {
+            val startOfMonth = YearMonth.now().atDay(1).atStartOfDay()
+            events.filter { !it.datum.isBefore(startOfMonth) }
+        }
+
+        "last month" -> {
+            val lastMonth = YearMonth.now().minusMonths(1)
+            val startOfLastMonth = lastMonth.atDay(1).atStartOfDay()
+            val endOfLastMonth = lastMonth.atEndOfMonth().atTime(23, 59, 59)
+            events.filter {
+                (it.datum.isEqual(startOfLastMonth) || it.datum.isAfter(startOfLastMonth)) &&
+                        (it.datum.isEqual(endOfLastMonth) || it.datum.isBefore(endOfLastMonth))
+            }
+        }
+
+        "the last 90 days" -> {
+            val last90 = today.minusDays(90)
+            events.filter { !it.datum.isBefore(last90) }
+        }
+
+        else -> {
+            events
+        }
+    }
+}
+
+private fun calculateCosts(events: List<Event>): Double {
+    return events.sumOf { it.ausgaben }
+}
+
+private fun countDifferentLocations(events: List<Event>): Int {
+    return events.map { it.standort }.distinct().count()
 }

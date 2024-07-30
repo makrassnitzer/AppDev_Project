@@ -38,8 +38,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -130,7 +132,7 @@ private fun EventsCard(event: Event) {
         border = BorderStroke(1.dp, Purple80),
         modifier = Modifier
             .padding(10.dp)
-            .width(165.dp)
+            .width(300.dp)
     ) {
         Row(modifier = Modifier.padding(18.dp)) {
             Column(modifier = Modifier.weight(1f)) {
@@ -161,25 +163,54 @@ private fun EventsCard(event: Event) {
         }
     }
 
+    // info button handling
     if (showDetail) {
         AlertDialog(
-            onDismissRequest = { showDetail = false },
-            title = { Text(text = event.bezeichnung) },
+            icon = {
+                Icon(Icons.Default.Info, tint = Purple80, contentDescription = null)
+            },
+            title = {
+                Text(
+                    text = event.bezeichnung,
+                    color = Purple80
+                )
+            },
             text = {
                 Column {
-                    Text(text = "Date: ${event.datum.toLocalDate()}")
-                    Text(text = "Time: ${event.datum.toLocalTime()}")
-                    Text(text = "Location: ${event.standort}")
-                    Text(text = "Members: ${event.teilnehmer}")
-                    Text(text = "Costs: ${event.ausgaben}")
-                    event.additionalInfoPath?.let {
-                        Text(text = "Additional Info: $it")
-                    }
+                    Text(
+                        text = "Date: ${event.datum.toLocalDate()}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Time: ${event.datum.toLocalTime()}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Location: ${event.standort}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Members: ${event.teilnehmer}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Costs: ${event.ausgaben}",
+                        color = Purple80
+                    )
+                    Text(
+                        text = "Additional Info: ${event.additionalInfoPath}",
+                        color = Purple80
+                    )
                 }
             },
+            onDismissRequest = {
+                showDetail = false
+            },
             confirmButton = {
-                OutlinedButton(onClick = { showDetail = false }) {
-                    Text("OK")
+                TextButton(
+                    onClick = { showDetail = false }
+                ) {
+                    Icon(Icons.Default.Close, tint = Color.Red, contentDescription = null)
                 }
             }
         )
