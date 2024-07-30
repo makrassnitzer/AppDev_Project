@@ -1,5 +1,6 @@
 package com.example.eventplanner
 
+import com.example.eventplanner.data.Event
 import java.time.YearMonth
 
 data class CalendarUiState(
@@ -27,6 +28,6 @@ data class CalendarUiState(
         val day: String,
         val month: Int,
         val year: Int,
-        val events: List<String>
+        val events: List<Event>
     )
 }

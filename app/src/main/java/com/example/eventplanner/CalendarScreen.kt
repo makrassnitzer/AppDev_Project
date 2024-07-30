@@ -1,5 +1,6 @@
 package com.example.eventplanner
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -28,14 +29,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.eventplanner.data.Event
+import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.CalendarViewModel
 import com.example.eventplanner.ui.DateUtil
 import com.example.eventplanner.ui.getDisplayName
@@ -43,13 +51,13 @@ import java.time.YearMonth
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(context: Context) {
     Column (
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        CalendarApp()
+        CalendarApp(context)
     }
 }
 
@@ -57,9 +65,14 @@ fun CalendarScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarApp(
+    context: Context,
     viewModel: CalendarViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val events by remember { mutableStateOf(EventUtils.loadEventsFromFile(context)) }
+    LaunchedEffect(events) {
+        viewModel.setEvents(events)
+    }
 
     Scaffold(
         topBar = {
@@ -140,18 +153,28 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
                     style = MaterialTheme.typography.headlineSmall
                 )
                 details.events.forEach { event ->
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = event,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    EventView(event)
                 }
             }
         }
     }
 }
 
+@Composable
+fun EventView(event: Event) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(
+            text = event.eventart,  // Assuming Event has a title property
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp)
+        )
+        Text(
+            text = event.bezeichnung,  // Assuming Event has a description property
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarWidget(
     days: Array<String>,

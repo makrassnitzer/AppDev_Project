@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         composable("home") { MainScreen(navController, context = LocalContext.current) }
                         composable("addEvent") { AddEventScreen(navController) }
                         composable("myEvents") { MyEventsScreen(context = LocalContext.current) }
-                        composable("calendar") { CalendarScreen() }
+                        composable("calendar") { CalendarScreen(context = LocalContext.current)}
                     }
                 }
             }
