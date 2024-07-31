@@ -5,7 +5,7 @@ Diese App wurde in Kotlin geschrieben und dient zur vereinfachten Terminkoordina
 Auf der Startseite gibt es eine Übersicht, welche die zukünftigen Events abbildet sowie eine Übersicht, welche monatliche Statistiken (Anzahl der Events, Ausgaben, verschiedene Standorte) zeigt.
 Die Zeitspanne dieser Statistiken kann anhand eines Dropdowns angepasst werden.
 Weiters kann man hier auf die anderen Seiten der App navigieren.
-m ein neues Event erstellen zu können, muss man zumindest einen Titel sowie eine Uhrzeit und das Datum des jeweiligen Events bereitstellen. 
+Um ein neues Event erstellen zu können, muss man zumindest einen Titel sowie eine Uhrzeit und das Datum des jeweiligen Events bereitstellen. 
 Zu empfehlen ist jedoch die weiteren Eingabefelder ebenfalls auszufüllen, um eine optimale Auswertung der Statisken zu erhalten.
 Man kann, um zu diesem Vorgang zu kommen, einfach in der App hinnavigieren oder durch Schüttlen des Handys ebenfalls ein Event erstellen.
 Des Weiteren kann man bei der Erstellung eines Events die Email von einem Begleiter bereitstellen, um diesen dann direkt per Mail über das Event zu informieren.
