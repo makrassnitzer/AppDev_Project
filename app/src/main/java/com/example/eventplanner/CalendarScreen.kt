@@ -302,6 +302,7 @@ fun createCalendarEventIntent(event: Event): Intent {
         putExtra(CalendarContract.Events.TITLE, event.bezeichnung)
         putExtra(CalendarContract.Events.DESCRIPTION, event.additionalInfoPath)
         putExtra(CalendarContract.Events.EVENT_LOCATION, event.standort)
+        putExtra(Intent.EXTRA_EMAIL, event.teilnehmer)
         putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
     }
 }
