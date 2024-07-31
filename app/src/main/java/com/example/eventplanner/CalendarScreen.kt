@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -60,6 +61,7 @@ import com.example.eventplanner.ui.getDisplayName
 import com.example.eventplanner.ui.theme.Purple80
 import java.time.YearMonth
 
+// Enthält die Hauptkomponente und übergibt den Kontext der für die Eventselektion nötig ist
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(context: Context) {
@@ -72,6 +74,7 @@ fun CalendarScreen(context: Context) {
     }
 }
 
+// Hauptkomponente der Kalender-App
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,6 +130,7 @@ fun CalendarApp(
     }
 }
 
+// Zeigt Details zum ausgewählten Datum an
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
@@ -162,9 +166,17 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
                     fontWeight = FontWeight.SemiBold,
                     color = Purple80
                 )
-                LazyRow {
-                    items(details.events) { event ->
-                        EventView(event)
+                if(details.events.isEmpty()){
+                    Text(
+                        text = "Nothing to display",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Purple80
+                    )
+                }else {
+                    LazyColumn {
+                        items(details.events) { event ->
+                            EventView(event)
+                        }
                     }
                 }
             }
@@ -172,6 +184,7 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
     }
 }
 
+// Zeigt ein einzelnes Event an und ermöglicht die Anzeige von Details in einem Dialog
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EventView(event: Event) {
@@ -261,6 +274,7 @@ fun EventView(event: Event) {
     }
 }
 
+// Kalender-Widget, das Tage, Monatsüberschrift und Navigationspfeile anzeigt
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarWidget(
@@ -277,10 +291,7 @@ fun CalendarWidget(
             .padding(16.dp)
     ) {
         Row {
-            repeat(days.size) {
-                val item = days[it]
-                DayItem(item, modifier = Modifier.weight(1f))
-            }
+            days.forEach { day -> DayItem(day, modifier = Modifier.weight(1f)) }
         }
         Header(
             yearMonth = yearMonth,
@@ -294,6 +305,7 @@ fun CalendarWidget(
     }
 }
 
+// Überschrift des Kalenders mit Monatsnamen und Navigationstasten
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Header(
@@ -329,6 +341,7 @@ fun Header(
     }
 }
 
+// Anzeige eines Wochentags
 @Composable
 fun DayItem(day: String, modifier: Modifier = Modifier) {
     Box(modifier = modifier) {
@@ -343,6 +356,7 @@ fun DayItem(day: String, modifier: Modifier = Modifier) {
     }
 }
 
+// Inhalt des Kalenders, der die Tage des Monats anzeigt
 @Composable
 fun Content(
     dates: List<CalendarUiState.Date>,
@@ -375,6 +389,7 @@ fun Content(
     }
 }
 
+// Anzeige eines einzelnen Kalendertages
 @Composable
 fun ContentItem(
     date: CalendarUiState.Date,
@@ -384,7 +399,7 @@ fun ContentItem(
     Box(
         modifier = modifier
             .background(
-                color = if (date.hasEvents) {// Change color if the date has events
+                color = if (date.hasEvents) {// Andere Farbe wenn es an dem Tag ein Event gibt
                     MaterialTheme.colorScheme.tertiary
                 } else if (date.isSelected) {
                     MaterialTheme.colorScheme.secondaryContainer

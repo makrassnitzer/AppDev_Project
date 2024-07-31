@@ -15,10 +15,10 @@ class CalendarDataSource {
                 dayOfMonth = if (datum.monthValue == yearMonth.monthValue) {
                     "${datum.dayOfMonth}"
                 } else {
-                    "" // Fill with empty string for days outside the current month
+                    "" // Tage auserhalb des Monats sind leer
                 },
-                isSelected = false, // Initially no date is selected
-                hasEvents = eventDates.containsKey(datum) // Check if the date has events
+                isSelected = false, // Kein Tag ist am Begin selektiert
+                hasEvents = eventDates.containsKey(datum) // Es wird geschaut ob ein Tag ein Event hat um es dann farblich zu markieren
             )
         }
     }

@@ -23,7 +23,7 @@ class CalendarViewModel : ViewModel() {
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
     private var allEvents: List<Event> = emptyList()
 
-
+    // Setzt und lädt die Events für den aktuellen Monat
     fun setEvents(events: List<Event>) {
         allEvents = events
         viewModelScope.launch {
@@ -31,16 +31,17 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
+    // Wechselt zum nächsten Monat und lädt die Events
     fun toNextMonth(nextMonth: YearMonth) {
         fetchEventsForMonth(nextMonth)
-        handleMonthChange(nextMonth)
     }
 
+    // Wechselt zum vorherigen Monat und lädt die Events
     fun toPreviousMonth(prevMonth: YearMonth) {
         fetchEventsForMonth(prevMonth)
-        handleMonthChange(prevMonth)
     }
 
+    // Markiert ein Datum als ausgewählt und zeigt nähere Informationen an
     @RequiresApi(Build.VERSION_CODES.O)
     fun onDateSelected(date: CalendarUiState.Date) {
         viewModelScope.launch {
@@ -65,34 +66,7 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleMonthChange(monthChange: YearMonth) {
-        viewModelScope.launch {
-            val selectedDateDetails = _uiState.value.selectedDateDetails
-            val events = allEvents.filter {
-                it.datum.monthValue == monthChange.monthValue &&
-                it.datum.year == monthChange.year
-            }
-            val dates = dataSource.getDates(monthChange, events).map { date ->
-                if (selectedDateDetails != null &&
-                    selectedDateDetails.day == date.dayOfMonth &&
-                    selectedDateDetails.month == monthChange.monthValue &&
-                    selectedDateDetails.year == monthChange.year
-                ) {
-                    date.copy(isSelected = true)
-                } else {
-                    date
-                }
-            }
-            _uiState.update { currentState ->
-                currentState.copy(
-                    yearMonth = monthChange,
-                    dates = dates
-                )
-            }
-        }
-    }
-
+    // Lädt die Events für einen bestimmten Monat
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchEventsForMonth(yearMonth: YearMonth) {
         viewModelScope.launch {

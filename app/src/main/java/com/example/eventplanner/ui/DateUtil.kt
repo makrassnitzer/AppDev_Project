@@ -11,6 +11,7 @@ import java.util.Locale
 
 object DateUtil {
 
+    // Gibt die Wochentage als Array von Strings zurück, beginnend mit Montag
     val daysOfWeek: Array<String>
         @RequiresApi(Build.VERSION_CODES.O)
         get() {
@@ -30,12 +31,12 @@ fun YearMonth.getDayOfMonthStartingFromMonday(): List<LocalDate> {
     val firstDayOfMonth = this.atDay(1)
     val lastDayOfMonth = this.atEndOfMonth()
 
-    // Determine the first Monday before or on the first day of the month
+    // Bestimmt den ersten Montag vor oder am ersten Tag des Monats
     val firstMonday = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-    // Determine the last Sunday after or on the last day of the month
+    // Bestimmt den letzten Sonntag nach oder am letzten Tag des Monats
     val lastSunday = lastDayOfMonth.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
 
-    // Generate a list of dates from the first Monday to the last Sunday
+    // Generiert eine Liste von Daten vom ersten Montag bis zum letzten Sonntag
     return (0..lastSunday.toEpochDay() - firstMonday.toEpochDay()).map {
         firstMonday.plusDays(it)
     }
