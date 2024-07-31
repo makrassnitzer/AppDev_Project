@@ -356,7 +356,6 @@ private fun UpcomingEventsCard(event: Event) {
                         color = Purple80,
                         fontWeight = FontWeight.SemiBold
                     )
-
                     Text(
                         text = event.datum.toLocalDate().toString(),
                         color = Purple80,
@@ -364,7 +363,6 @@ private fun UpcomingEventsCard(event: Event) {
                         fontWeight = FontWeight.Light
                     )
                 }
-
                 IconButton(
                     onClick = { showDetail = true },
                     modifier = Modifier.background(
@@ -377,7 +375,6 @@ private fun UpcomingEventsCard(event: Event) {
             }
         }
     }
-
     // info button handling
     if (showDetail) {
         AlertDialog(
@@ -458,14 +455,12 @@ private fun MonthlyOverview(events: List<Event>, selectedPeriod: String) {
                     color = Purple80,
                     fontWeight = FontWeight.Light
                 )
-
                 Text(
                     text = "Costs: $periodCosts €",
                     color = Purple80,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light
                 )
-
                 Text(
                     text = "Different Locations: $differentLocations",
                     color = Purple80,
@@ -486,7 +481,6 @@ private fun filterForOverview(events: List<Event>, filterPeriod: String): List<E
             val endOfCurrMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59)
             events.filter { !it.datum.isBefore(startOfCurrMonth) && !it.datum.isAfter(endOfCurrMonth) }
         }
-
         "last month" -> {
             val lastMonth = YearMonth.now().minusMonths(1)
             val startOfLastMonth = lastMonth.atDay(1).atStartOfDay()
@@ -496,7 +490,6 @@ private fun filterForOverview(events: List<Event>, filterPeriod: String): List<E
                         (it.datum.isEqual(endOfLastMonth) || it.datum.isBefore(endOfLastMonth))
             }
         }
-
         "the last 90 days" -> {
             val last90 = today.minusDays(90)
             events.filter { !it.datum.isBefore(last90) }

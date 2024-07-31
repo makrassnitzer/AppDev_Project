@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,12 +13,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -39,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,12 +57,13 @@ import com.example.eventplanner.data.EventUtils
 import com.example.eventplanner.ui.CalendarViewModel
 import com.example.eventplanner.ui.DateUtil
 import com.example.eventplanner.ui.getDisplayName
+import com.example.eventplanner.ui.theme.Purple80
 import java.time.YearMonth
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(context: Context) {
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -80,7 +91,8 @@ fun CalendarApp(
                 title = { Text(stringResource(id = R.string.app_name)) },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
-                ))
+                )
+            )
         }
     ) { padding ->
 
@@ -115,34 +127,30 @@ fun CalendarApp(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
-    ElevatedCard (
+    ElevatedCard(
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.padding(10.dp)
     ) {
         Row(modifier = Modifier.padding(20.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Selected Date Details:",
-                    style = MaterialTheme.typography.headlineMedium
+                    text = "Selected Date: ",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Purple80
                 )
                 Text(
-                    text = "Day: ${details.day}",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = "Month: ${details.month}",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = "Year: ${details.year}",
-                    style = MaterialTheme.typography.headlineSmall
+                    text = details.day + "." + details.month + "." + details.year,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Purple80
                 )
             }
         }
     }
-    ElevatedCard (
+    ElevatedCard(
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.padding(10.dp)
     ) {
@@ -150,27 +158,106 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Events:",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Purple80
                 )
-                details.events.forEach { event ->
-                    EventView(event)
+                LazyRow {
+                    items(details.events) { event ->
+                        EventView(event)
+                    }
                 }
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EventView(event: Event) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(
-            text = event.eventart,  // Assuming Event has a title property
-            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp)
-        )
-        Text(
-            text = event.bezeichnung,  // Assuming Event has a description property
-            style = MaterialTheme.typography.bodyMedium
-        )
+    var showDetail by remember { mutableStateOf(false) }
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, Purple80),
+        modifier = Modifier
+            .padding(10.dp)
+            .width(300.dp)
+    ) {
+        Row(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = event.bezeichnung,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Purple80
+                )
+            }
+            IconButton(
+                onClick = { showDetail = true },
+                modifier = Modifier.background(
+                    color = Purple80,
+                    shape = RoundedCornerShape(10.dp)
+                )
+            ) {
+                Icon(Icons.Default.Info, tint = Color.White, contentDescription = null)
+            }
+        }
+
+        // info button handling
+        if (showDetail) {
+            AlertDialog(
+                icon = {
+                    Icon(Icons.Default.Info, tint = Purple80, contentDescription = null)
+                },
+                title = {
+                    Text(
+                        text = event.bezeichnung,
+                        color = Purple80
+                    )
+                },
+                text = {
+                    Column {
+                        Text(
+                            text = "Date: ${event.datum.toLocalDate()}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Time: ${event.datum.toLocalTime()}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Type: ${event.eventart}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Location: ${event.standort}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Members: ${event.teilnehmer}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Costs: ${event.ausgaben}",
+                            color = Purple80
+                        )
+                        Text(
+                            text = "Additional Info: ${event.additionalInfoPath}",
+                            color = Purple80
+                        )
+                    }
+                },
+                onDismissRequest = {
+                    showDetail = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = { showDetail = false }
+                    ) {
+                        Icon(Icons.Default.Close, tint = Color.Red, contentDescription = null)
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -268,7 +355,7 @@ fun Content(
             Row {
                 repeat(7) {
                     val item = if (index < dates.size) dates[index] else CalendarUiState.Date.Empty
-                    if(item == CalendarUiState.Date.Empty){
+                    if (item == CalendarUiState.Date.Empty) {
                         ContentItem(
                             date = item,
                             onClickListener = {},

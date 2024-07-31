@@ -1,5 +1,6 @@
 package com.example.eventplanner.data
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -77,17 +78,19 @@ object EventUtils {
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleNotification(event: Event, context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             putExtra("eventName", event.bezeichnung)
         }
+
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            event.id.hashCode(),
+            0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE // Add this flag
         )
 
         val eventDateTime = event.datum.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
