@@ -1,7 +1,9 @@
 package com.example.eventplanner
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.CalendarContract
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -48,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +63,7 @@ import com.example.eventplanner.ui.DateUtil
 import com.example.eventplanner.ui.getDisplayName
 import com.example.eventplanner.ui.theme.Purple80
 import java.time.YearMonth
+import java.util.Calendar
 
 // Enthält die Hauptkomponente und übergibt den Kontext der für die Eventselektion nötig ist
 @RequiresApi(Build.VERSION_CODES.O)
@@ -189,6 +193,8 @@ fun SelectedDateDetailsView(details: CalendarUiState.SelectedDateDetails) {
 @Composable
 fun EventView(event: Event) {
     var showDetail by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
     Card(
         shape = RoundedCornerShape(14.dp),
         border = BorderStroke(1.dp, Purple80),
@@ -268,11 +274,39 @@ fun EventView(event: Event) {
                     ) {
                         Icon(Icons.Default.Close, tint = Color.Red, contentDescription = null)
                     }
+                    TextButton(
+                        onClick = {
+                            val intent = createCalendarEventIntent(event)
+                            context.startActivity(intent)
+                            showDetail = false
+                        }
+                    ) {
+                        Text("Add to Calendar")
+                    }
                 }
             )
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun createCalendarEventIntent(event: Event): Intent {
+    val time = Calendar.getInstance().apply {
+        set(event.datum.year, event.datum.monthValue, event.datum.dayOfMonth, event.datum.hour, event.datum.minute)
+    }
+
+    return Intent(Intent.ACTION_INSERT).apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, time.timeInMillis)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, time.timeInMillis)
+        putExtra(CalendarContract.Events.TITLE, event.bezeichnung)
+        putExtra(CalendarContract.Events.DESCRIPTION, event.additionalInfoPath)
+        putExtra(CalendarContract.Events.EVENT_LOCATION, event.standort)
+        putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
+    }
+}
+
+
 
 // Kalender-Widget, das Tage, Monatsüberschrift und Navigationspfeile anzeigt
 @RequiresApi(Build.VERSION_CODES.O)
@@ -400,7 +434,7 @@ fun ContentItem(
         modifier = modifier
             .background(
                 color = if (date.hasEvents) {// Andere Farbe wenn es an dem Tag ein Event gibt
-                    MaterialTheme.colorScheme.tertiary
+                    Color.Yellow
                 } else if (date.isSelected) {
                     MaterialTheme.colorScheme.secondaryContainer
                 } else {
